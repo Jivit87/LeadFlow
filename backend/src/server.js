@@ -10,14 +10,17 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 
-app.use(cors());
+app.use(cors({
+  origin: ["https://leadflow-0m21.onrender.com", "http://localhost:5173"],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Socket.IO for real-time capabilities
 const io = new Server(server, {
   cors: {
-    origin: "*", 
+    origin: ["https://leadflow-0m21.onrender.com", "http://localhost:5173"], 
     methods: ["GET", "POST"]
   }
 });
