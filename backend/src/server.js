@@ -4,7 +4,8 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const connectDB = require('./config/db');
-const eventController = require('./controllers/eventController');
+
+connectDB();
 
 const app = express();
 const server = http.createServer(app);
@@ -41,6 +42,11 @@ app.get('/', (req, res) => {
   res.send('LeadFlow API is running');
 });
 
+const eventController = require('./controllers/eventController');
+
+// Inject io into controller for notifications
+eventController.setScoringService(io);
+
 // Routes
 app.use('/api/leads', require('./routes/leadRoutes'));
 app.use('/api/events', require('./routes/eventRoutes'));
@@ -48,20 +54,6 @@ app.use('/api/rules', require('./routes/ruleRoutes'));
 
 const PORT = process.env.PORT || 5000;
 
-const startServer = async () => {
-  try {
-    await connectDB();
-    
-    // Inject io into controller for notifications AFTER DB is connected
-    eventController.setScoringService(io);
-
-    server.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-  } catch (err) {
-    console.error('Failed to connect to DB', err);
-    process.exit(1);
-  }
-};
-
-startServer();
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
